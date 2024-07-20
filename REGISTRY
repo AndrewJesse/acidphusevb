@@ -1,0 +1,123 @@
+'PUBLIC DECLARATIONS // FIELD LOCATIONS BY WORKSHEET
+'PUBLIC GUI VARIABLES
+Public sLGrey As String
+Public sDGrey As String
+Public sBlack As String
+Public sLBlue As String
+Public sDblue As String
+Public sLYellow As String
+Public sMYellow As String
+Public sLOrng As String
+Public sLGreen As String
+Public sMGreen As String
+Public sWhite As String
+Public sLRed As String
+Public sMRed As String
+Public sLPink As String
+Public sCMBDef As String
+Public sLogin As String
+Public sProgress As String
+Public sCheck As String
+Public sX As String
+Public sExclm As String
+
+
+'PUBLIC BOOLEANS
+Public bEdit As Boolean
+Public bExist As Boolean
+
+'PUBLIC FORM VARIABLES
+Public txtForm As MSForms.TextBox
+Public lblForm As MSForms.Label
+Public lblFormGUI As MSForms.Label
+
+'PUBLIC RANGES
+Public rSearch As Range
+
+'PUBLIC STRINGS
+Public sFind As String
+
+'PUBLIC DOUBLES
+Public nextRow As Double
+Public lastRow As Double
+Public dFind As Double
+Public lastColumn As Double
+Public dTipsOwed As Double
+Public dTippable As Double
+
+'PUBLIC LOCAL REGISTRY FIELDS
+Public REG_Tipped As Double
+Public REG_TippedOut As Double
+Public REG_AllActiveTeam As Double
+Public REG_Manager As Double
+Public REG_FilePath As Double
+Public REG_OneDrive As Double
+Public REG_ODString As Double
+Public REG_Location As Double
+Public REG_Phone As Double
+Public REG_Street As Double
+Public REG_CityStateZip As Double
+Public REG_LicenseKey As Double
+Public REG_LicenseDate As Double
+Public REG_Version As Double
+Public REG_LastUpdate As Double
+Public REG_Desktop As Double
+Public REG_NBO156Name As Double
+Public REG_NBO156Type As Double
+Public REG_Codes As Double
+Public REG_TipOut_Server As Double
+Public REG_TipOut_Cocktail As Double
+Public REG_TipOut_Bartender As Double
+
+
+'RUN AT THE START OF MOST PROCESSES
+Sub SetReg()
+
+sLGrey = &H80000004
+sDGrey = &H80000011
+sBlack = &H80000012
+sLGreen = &HC0FFC0
+sMGreen = &H8000&
+sLBlue = &HFFFFC0
+sDblue = &HC00000
+sLYellow = &H80FFFF
+sMYellow = &HC0C0&
+sLOrng = &H80C0FF
+sWhite = &H80000005
+sLRed = &HC0C0FF
+sMRed = &HC0&
+sLPink = &HFF80FF
+sCMBDef = &HE0E0E0
+
+Set rSearch = WSReg.Rows(1)
+
+REG_Tipped = rSearch.Find("REG_Tipped", lookat:=xlWhole, searchdirection:=xlNext).Column
+REG_TippedOut = rSearch.Find("REG_TippedOut", lookat:=xlWhole, searchdirection:=xlNext).Column
+REG_AllActiveTeam = rSearch.Find("REG_AllActiveTeam", lookat:=xlWhole, searchdirection:=xlNext).Column
+REG_FilePath = rSearch.Find("REG_FilePath", lookat:=xlWhole, searchdirection:=xlNext).Column
+REG_ODString = rSearch.Find("REG_ODString", lookat:=xlWhole, searchdirection:=xlNext).Column
+REG_OneDrive = rSearch.Find("REG_OneDrive", lookat:=xlWhole, searchdirection:=xlNext).Column
+REG_Manager = rSearch.Find("REG_Manager", lookat:=xlWhole, searchdirection:=xlNext).Column
+REG_Location = rSearch.Find("REG_Location", lookat:=xlWhole, searchdirection:=xlNext).Column
+REG_Phone = rSearch.Find("REG_Phone", lookat:=xlWhole, searchdirection:=xlNext).Column
+REG_Street = rSearch.Find("REG_Street", lookat:=xlWhole, searchdirection:=xlNext).Column
+REG_CityStateZip = rSearch.Find("REG_CityStateZip", lookat:=xlWhole, searchdirection:=xlNext).Column
+REG_LicenseKey = rSearch.Find("REG_LicenseKey", lookat:=xlWhole, searchdirection:=xlNext).Column
+REG_LicenseDate = rSearch.Find("REG_LicenseDate", lookat:=xlWhole, searchdirection:=xlNext).Column
+REG_Version = rSearch.Find("REG_Version", lookat:=xlWhole, searchdirection:=xlNext).Column
+REG_LastUpdate = rSearch.Find("REG_LastUpdate", lookat:=xlWhole, searchdirection:=xlNext).Column
+REG_Desktop = rSearch.Find("REG_Desktop", lookat:=xlWhole, searchdirection:=xlNext).Column
+REG_NBO156Name = rSearch.Find("REG_NBO156Name", lookat:=xlWhole, searchdirection:=xlNext).Column
+REG_NBO156Type = rSearch.Find("REG_NBO156Type", lookat:=xlWhole, searchdirection:=xlNext).Column
+REG_Codes = rSearch.Find("REG_Codes", lookat:=xlWhole, searchdirection:=xlNext).Column
+REG_TipOut_Server = rSearch.Find("REG_TipOut_Server", lookat:=xlWhole, searchdirection:=xlNext).Column
+REG_TipOut_Cocktail = rSearch.Find("REG_TipOut_Cocktail", lookat:=xlWhole, searchdirection:=xlNext).Column
+REG_TipOut_Bartender = rSearch.Find("REG_TipOut_Bartender", lookat:=xlWhole, searchdirection:=xlNext).Column
+
+
+sCheck = &H2714
+sX = &H2718
+sExclm = &H26A0
+
+End Sub
+
