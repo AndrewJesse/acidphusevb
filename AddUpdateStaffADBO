@@ -1,0 +1,60 @@
+Sub AddUpdateStaffADBO()
+Call SetReg
+Call SetDBReg
+Call SetStaffReg
+
+Dim r As Double
+    r = 2
+
+Dim sEID As String
+
+'OPEN THE CONNECTION TO THE ACCESS DATABASE
+Call DBConnectionOpen
+
+'DEFINE THE TABLE NAME
+GsTblName = "tblStaff"
+            
+            
+'ADD EID TO UNIQUE ID FOR ANY NEW EMPLOYEES - LEAVE ALL OTHER FIELDS BLANK
+Do Until WSStaff.Cells(r, STF_EID) = "" Or r > 10000
+    If WSStaff.Cells(r, STF_Update) = "NEW" Then
+        sEID = WSStaff.Cells(r, STF_EID)
+        'SQL INSERT EXPRESSION
+        GsWrite = "INSERT INTO " & GsTblName & " (STF_EID)" & " VALUES " & "(" & sEID & ")"
+        Connection.Execute (GsWrite)
+        WSStaff.Cells(r, STF_Update) = True
+    Else: End If
+    r = r + 1
+Loop
+
+r = 2
+
+Dim i As Double
+i = 2
+Dim fieldName As String
+Dim fieldValue As Variant
+Dim cStop As Double
+    cStop = WSStaff.Rows(1).Find("*", lookat:=xlWhole, searchdirection:=xlPrevious).Column
+    
+'UPDATE ALL FIELDS WHERE CHANGES HAVE BEEN MADE
+Do Until WSStaff.Cells(r, STF_EID) = "" Or r > 10000
+    If WSStaff.Cells(r, STF_Update) = True Then
+        sEID = WSStaff.Cells(r, STF_EID)
+        For i = 2 To cStop
+            If WSStaff.Cells(r, i).Value = "" Then
+                GoTo e2
+            Else: End If
+            fieldName = WSStaff.Cells(1, i).Value
+            fieldValue = WSStaff.Cells(r, i).Value
+            GsSource = "UPDATE " & GsTblName & " SET " & fieldName & " = '" & fieldValue & "' WHERE STF_EID = " & sEID
+            Connection.Execute (GsSource)
+e2:
+        Next i
+        WSStaff.Cells(r, STF_Update) = ""
+    Else: End If
+    r = r + 1
+Loop
+
+Call DBConnectionClose
+DoEvents
+End Sub
