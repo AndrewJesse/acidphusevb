@@ -1,0 +1,170 @@
+Sub ImportEmployeesNBO156()
+Application.ScreenUpdating = False
+
+Call SetReg
+Call DefineLocations
+
+WSNBOEmp.Cells.Clear
+
+Dim sFile As String
+    sFile = WSReg.Cells(2, REG_NBO156Name) & WSReg.Cells(2, REG_NBO156Type)
+Dim sPath As String
+    sPath = sLocalDsktp & "\" & sFile
+
+If Dir(sPath) = "" Then
+    MsgBox "NBO 156 Report Not Found on Desktop"
+    Exit Sub
+Else: End If
+
+Dim wbActive As Workbook
+    Set wbActive = ThisWorkbook
+    
+Application.Workbooks.Open Filename:=sPath
+
+Dim wbImport As Workbook
+    Set wbImport = Workbooks(sFile)
+
+wbImport.Sheets("Sheet1").UsedRange.Copy
+wbActive.Sheets("NBO156").Range("A1").PasteSpecial xlPasteValues
+
+Call ClearClipboard
+
+wbImport.Close SaveChanges:=False
+Application.ScreenUpdating = True
+
+End Sub
+
+
+Sub Format156()
+
+Call SetReg
+
+Dim c As Double
+Dim i As Double
+Dim r As Double
+Dim sTest As String
+Dim rP As Double
+Dim cP As Double
+c = 1
+
+If WSNBOEmp.Cells(1, 1) = "Employee Name" = False Then 'THE FIRST COLUMN AND TOP ROWS HAVE NOT BEEN CLEARED...
+    'DELETE THE FIRST COLUMN
+    WSNBOEmp.Columns(6).EntireColumn.Delete
+    WSNBOEmp.Columns(1).EntireColumn.Delete
+    i = WSNBOEmp.Columns(c).Find("*", lookat:=xlWhole, searchdirection:=xlNext).Row - 1
+    r = 1
+    'DELETE THE EMPTY ROWS ABOVE THE HEADERS
+    Do Until r > i Or r > 10000
+        WSNBOEmp.Rows(1).EntireRow.Delete
+        r = r + 1
+    Loop
+Else: End If
+
+
+rP = WSNBOEmp.Columns(c).Find("*", lookat:=xlWhole, searchdirection:=xlPrevious).Row - 1
+Dim rFind As Range
+    Set rFind = Range(WSNBOEmp.Cells(2, c), WSNBOEmp.Cells(rP, c))
+
+'FIND AND DELETE ALL ROWS WHOSE CELL CONTAINS THE TEXT "EMPLOYEE NAME" IN THE FIRST COLUMN
+Do Until rFind.Find("Employee Name", lookat:=xlWhole, searchdirection:=xlNext) Is Nothing
+    r = rFind.Find("Employee Name", lookat:=xlWhole, searchdirection:=xlNext).Row
+    WSNBOEmp.Rows(r).EntireRow.Delete
+Loop
+
+'FIND AND DELETE ALL ROWS THAT CONTAIN A BLANK CELL IN THE FIRST COLUMN
+Do Until rFind.Find("", lookat:=xlWhole, searchdirection:=xlNext) Is Nothing
+    r = rFind.Find("", lookat:=xlWhole, searchdirection:=xlNext).Row
+    WSNBOEmp.Rows(r).EntireRow.Delete
+Loop
+
+r = 1
+
+cP = WSNBOEmp.Rows(1).Find("*", lookat:=xlWhole, searchdirection:=xlPrevious).Column
+
+Set rFind = Range(WSNBOEmp.Cells(r, c), WSNBOEmp.Cells(r, cP))
+
+'FIND AND DELETE ALL COLUMNS THAT CONTAIN A BLANK CELL IN THE FIRST ROW
+Do Until rFind.Find("", lookat:=xlWhole, searchdirection:=xlNext) Is Nothing
+    c = rFind.Find("", lookat:=xlWhole, searchdirection:=xlNext).Column
+    WSNBOEmp.Columns(c).EntireColumn.Delete
+Loop
+
+r = 2
+rP = WSNBOEmp.Columns(c).Find("*", lookat:=xlWhole, searchdirection:=xlPrevious).Row - 1
+
+Dim dEID As Double
+
+Do Until WSNBOEmp.Cells(r, 2) = "" Or r > 10000
+    dEID = WSNBOEmp.Cells(r, 2)
+    WSNBOEmp.Cells(r, 2) = dEID
+    r = r + 1
+Loop
+
+WSNBOEmp.Columns.EntireColumn.AutoFit
+
+End Sub
+
+Sub AddNewEmployees()
+
+Call SetReg
+Call SetStaffReg
+
+Dim r As Double
+    r = 2
+
+Dim sNameDef As String
+Dim sFirst As String
+Dim sLast As String
+Dim sName As String
+Dim p As Double 'POSITION OF COMMA IN sNameDef
+Dim l As Double 'LENGTH OF sNameDef
+
+Set rSearch = WSNBOEmp.Columns(NBO156_EmployeeName)
+Call LastCell
+Dim rP As Double
+    rP = lastRow
+    
+Set rSearch = WSStaff.Columns(STF_Name)
+Call NextBlank
+Dim i As Double
+    i = nextRow
+
+Do Until r > lastRow Or r > 10000
+    dFind = WSNBOEmp.Cells(r, NBO156_Number)
+    Set rSearch = WSStaff.Columns(STF_EID)
+    Call DblExists
+    If bExist = False Then
+        With WSStaff
+                sNameDef = WSNBOEmp.Cells(r, NBO156_EmployeeName)
+            If InStr(sNameDef, "'") > 0 Then
+                sNameDef = Replace(sNameDef, "'", "")
+            Else: End If
+            .Cells(i, STF_NameDef) = sNameDef
+                'PARSE sNameDef AND REFORMAT TO 'FIRST NAME LAST NAME'
+                    If InStr(sNameDef, ",") = 0 Then
+                        .Cells(i, STF_Name) = sNameDef
+                        GoTo e1
+                    Else: End If
+                    p = InStr(sNameDef, ",")
+                    l = Len(sNameDef)
+                    sFirst = Mid(sNameDef, p + 2, l - p + 1)
+                    sLast = Mid(sNameDef, 1, p - 1)
+                'END OF PARSE AND REFORMAT
+            .Cells(i, STF_Name) = sFirst & " " & sLast
+e1:
+            .Cells(i, STF_EID) = WSNBOEmp.Cells(r, NBO156_Number)
+            .Cells(i, STF_Status) = WSNBOEmp.Cells(r, NBO156_Status)
+            .Cells(i, STF_Hired) = Format(WSNBOEmp.Cells(r, NBO156_HireDate), "M/D/YYYY")
+            .Cells(i, STF_Termed) = Format(WSNBOEmp.Cells(r, NBO156_TermDate), "M/D/YYYY")
+            .Cells(i, STF_Rehire) = WSNBOEmp.Cells(r, NBO156_Rehire)
+            .Cells(i, STF_Update) = "NEW"
+        End With
+        i = i + 1
+    Else: End If
+    r = r + 1
+Loop
+
+WSNBOEmp.Cells.Clear
+
+
+End Sub
